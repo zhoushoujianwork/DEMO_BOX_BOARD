@@ -28,11 +28,6 @@ void set_device_imu_status(state_e status)
     g_device_state.imu_state = status;
 }
 
-void set_read_ble_finish(bool finish)
-{
-    g_device_state.read_ble_finish = finish;
-}
-
 void init_device_state()
 {
     memset(&g_device_state, 0, sizeof(device_state_t));
@@ -40,7 +35,6 @@ void init_device_state()
     g_device_state.gps_state = STATUS_LACK;
     g_device_state.battery = 13;
     g_device_state.temperature = 30;
-    g_device_state.read_ble_finish = false;
 
     // gps
     memset(&g_gps_data, 0, sizeof(gps_data_t));

@@ -43,7 +43,6 @@ typedef struct
     uint8_t temperature;
     state_e gps_state;
     state_e imu_state;
-    bool read_ble_finish;
 } device_state_t;
 
 void init_device_state();
