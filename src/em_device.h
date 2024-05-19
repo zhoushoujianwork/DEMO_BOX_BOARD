@@ -43,8 +43,6 @@ typedef struct
     uint8_t temperature;
     state_e gps_state;
     state_e imu_state;
-    gps_data_t gps_data;
-    imu_data_t imu_data;
     bool read_ble_finish;
 } device_state_t;
 

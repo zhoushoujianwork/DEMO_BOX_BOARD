@@ -1,26 +1,9 @@
 #include "em_task.h"
 #include "hal/led.h"
 #include "hal/btn.h"
-#include "hal/gps.h"
 #include "hal/ble.h"
 #include "hal/bat.h"
-#include "hal/imu.h"
 #include "hal/lvgl.h"
-#include "hal/em_timer.h"
-
-void run_report()
-{
-    if (get_state_timeout())
-    {
-        clean_state_timeout();
-        read_all_hal();
-        if (get_ble_connect())
-        {
-            Serial.print("report device status ： report time up\n");
-            ble_report();
-        }
-    }
-}
 
 void loop_led(void *pvParameters)
 {
@@ -44,25 +27,19 @@ void task_report(void *pvParameters)
 {
     for (;;) // A Task shall never return or exit.
     {
-        run_report();
-        vTaskDelay(100);
+        loop_ble();
+        vTaskDelay(1000);
     }
 }
 
 void init_task()
 {
     Serial.begin(115200);
-    init_device_state();
-    init_timer();
-    // init_hal();
-    // init_queue();
 
     setup_led();
     setup_bat();
     setup_btn();
-    setup_gps();
     setup_ble();
-    setup_imu();
     setup_lvgl();
 
     xTaskCreate(
@@ -95,5 +72,4 @@ void init_task()
 
 void loop_task()
 {
-    loop_gps();
 }
