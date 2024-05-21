@@ -39,8 +39,8 @@ void init_task()
     setup_led();
     setup_bat();
     setup_btn();
-    setup_ble();
     setup_lvgl();
+    setup_ble();
 
     xTaskCreate(
         loop_led,   // 任务函数
