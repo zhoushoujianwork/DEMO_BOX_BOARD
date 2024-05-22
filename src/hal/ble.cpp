@@ -30,9 +30,9 @@ static void notifyCallback(
     Serial.println((char *)pData);
     if (length == sizeof(device_state_t))
     {
-        device_state_t g_device_state;
-        memcpy(&g_device_state, pData, sizeof(device_state_t));
-        Serial.printf("gps_state = %d, imu_state = %d, battery = %d, temperature = %d\n", g_device_state.gps_state, g_device_state.imu_state, g_device_state.battery, g_device_state.temperature);
+        memcpy(get_device_state(), pData, sizeof(device_state_t));
+        Serial.println("set device state");
+        Serial.println(get_device_state()->battery);
     }
 }
 
@@ -171,23 +171,13 @@ void loop_ble()
             std::string value = pRemoteIMUCharacteristic->readValue();
             if (value.length() == sizeof(imu_data_t))
             {
-                imu_data_t imu;
-                memcpy(&imu, value.data(), sizeof(imu_data_t));
-
-                Serial.print("\naccX: ");
-                Serial.print(imu.ax);
-                Serial.print("\taccY: ");
-                Serial.print(imu.ay);
-                Serial.print("\taccZ: ");
-                Serial.print(imu.az);
-                Serial.print("\tgyroX: ");
-                Serial.print(imu.gx);
-                Serial.print("\tgyroY: ");
-                Serial.print(imu.gy);
-                Serial.print("\tgyroZ: ");
-                Serial.print(imu.gz);
-                Serial.print("\ttemp: ");
-                Serial.print(imu.temperature);
+                get_imu_data()->gx = ((imu_data_t *)value.data())->gx;
+                get_imu_data()->gy = ((imu_data_t *)value.data())->gy;
+                get_imu_data()->gz = ((imu_data_t *)value.data())->gz;
+                get_imu_data()->ax = ((imu_data_t *)value.data())->ax;
+                get_imu_data()->ay = ((imu_data_t *)value.data())->ay;
+                get_imu_data()->az = ((imu_data_t *)value.data())->az;
+                get_imu_data()->temperature = ((imu_data_t *)value.data())->temperature;
             }
             else
             {
@@ -200,35 +190,19 @@ void loop_ble()
             std::string value = pRemoteGPSCharacteristic->readValue();
             if (value.length() == sizeof(gps_data_t))
             {
-                gps_data_t gps;
-                memcpy(&gps, value.data(), sizeof(gps_data_t));
-
-                Serial.print("\nyear: ");
-                Serial.print(gps.year);
-                Serial.print("\tmonth: ");
-                Serial.print(gps.month);
-                Serial.print("\tday: ");
-                Serial.print(gps.day);
-                Serial.print("\thour: ");
-                Serial.print(gps.hour);
-                Serial.print("\tminute: ");
-                Serial.print(gps.minute);
-                Serial.print("\tsecond: ");
-                Serial.print(gps.second);
-                Serial.print("\tcentisecond: ");
-                Serial.print(gps.centisecond);
-                Serial.print("\tlat: ");
-                Serial.print(gps.lat);
-                Serial.print("\tlng: ");
-                Serial.print(gps.lng);
-                Serial.print("\taltitude: ");
-                Serial.print(gps.altitude);
-                Serial.print("\tspeed: ");
-                Serial.print(gps.speed);
-                Serial.print("\tdirection: ");
-                Serial.print(gps.direction);
-                Serial.print("\tsatellites: ");
-                Serial.print(gps.satellites);
+                get_gps_data()->satellites = ((gps_data_t *)value.data())->satellites;
+                get_gps_data()->lat = ((gps_data_t *)value.data())->lat;
+                get_gps_data()->lng = ((gps_data_t *)value.data())->lng;
+                get_gps_data()->altitude = ((gps_data_t *)value.data())->altitude;
+                get_gps_data()->speed = ((gps_data_t *)value.data())->speed;
+                get_gps_data()->direction = ((gps_data_t *)value.data())->direction;
+                get_gps_data()->year = ((gps_data_t *)value.data())->year;
+                get_gps_data()->month = ((gps_data_t *)value.data())->month;
+                get_gps_data()->day = ((gps_data_t *)value.data())->day;
+                get_gps_data()->hour = ((gps_data_t *)value.data())->hour;
+                get_gps_data()->minute = ((gps_data_t *)value.data())->minute;
+                get_gps_data()->second = ((gps_data_t *)value.data())->second;
+                get_gps_data()->centisecond = ((gps_data_t *)value.data())->centisecond;
             }
             else
             {

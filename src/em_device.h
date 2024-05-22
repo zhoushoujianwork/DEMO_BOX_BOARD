@@ -49,7 +49,9 @@ void init_device_state();
 
 device_state_t *get_device_state();
 
-void set_read_ble_finish(bool finish);
+gps_data_t *get_gps_data();
+
+imu_data_t *get_imu_data();
 
 void set_device_gps_status(state_e status);
 
