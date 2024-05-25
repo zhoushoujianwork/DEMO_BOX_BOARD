@@ -1,4 +1,7 @@
 #include "em_device.h"
+#include <time.h>
+
+time_t g_rawtime;
 
 device_state_t g_device_state;
 gps_data_t g_gps_data;
@@ -61,4 +64,7 @@ void init_device_state()
     g_imu_data.gy = 0;
     g_imu_data.gz = 0;
     g_imu_data.temperature = 0;
+
+    g_rawtime = 0;
+    time(&g_rawtime);
 }

@@ -29,7 +29,7 @@ void ui_Screen1_screen_init(void)
     // 设置圆弧的位置在左半边中央
     lv_coord_t ui_speed_arc_x = -(screen_width / 4);
     lv_obj_set_x(ui_speed, ui_speed_arc_x);
-    lv_obj_set_y(ui_speed, 0);
+    lv_obj_set_y(ui_speed, 10);
     lv_obj_set_align(ui_speed, LV_ALIGN_CENTER);
     lv_arc_set_range(ui_speed, 0, 299);
     lv_arc_set_value(ui_speed, 80);
@@ -45,7 +45,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_height(ui_speedText, LV_SIZE_CONTENT); /// 1
     // 放在 ui_speed 圆弧中间
     lv_obj_set_x(ui_speedText, ui_speed_arc_x);
-    lv_obj_set_y(ui_speedText, 0);
+    lv_obj_set_y(ui_speedText, 10);
     lv_obj_set_align(ui_speedText, LV_ALIGN_CENTER);
     lv_label_set_text(ui_speedText, "299");
     lv_obj_set_style_text_color(ui_speedText, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -96,7 +96,7 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_text_opa(ui_rollText, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_rollText, &lv_font_montserrat_22, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_coord_t altitude_y = -screen_height / 5;
+    lv_coord_t altitude_y = -(screen_height / 5) - 5;
     lv_coord_t altitude_x = screen_width * 0.1;
     ui_altitude = lv_img_create(ui_Screen1);
     lv_img_set_src(ui_altitude, &ui_img_haiba_png);
@@ -144,8 +144,8 @@ void ui_Screen1_screen_init(void)
     ui_gpsTime = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_gpsTime, LV_SIZE_CONTENT);  /// 1
     lv_obj_set_height(ui_gpsTime, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_gpsTime, screen_width * 0.15);
-    lv_obj_set_y(ui_gpsTime, -(screen_height / 2 - screen_height * 0.05));
+    lv_obj_set_x(ui_gpsTime, screen_width * 0.1);
+    lv_obj_set_y(ui_gpsTime, -(screen_height / 2 - screen_height * 0.05) + 7); // +下移
     lv_obj_set_align(ui_gpsTime, LV_ALIGN_CENTER);
     lv_label_set_text(ui_gpsTime, "1992-03-01 21:21:30");
     lv_obj_set_style_text_color(ui_gpsTime, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -174,16 +174,16 @@ void ui_Screen1_screen_init(void)
     lv_obj_add_flag(ui_gps, LV_OBJ_FLAG_ADV_HITTEST);  /// Flags
     lv_obj_clear_flag(ui_gps, LV_OBJ_FLAG_SCROLLABLE); /// Flags
 
-    ui_ble_nu = lv_label_create(ui_Screen1);
-    lv_obj_set_width(ui_ble_nu, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height(ui_ble_nu, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_ble_nu, -ui_gps_x);
-    lv_obj_set_y(ui_ble_nu, ui_gps_y);
-    lv_obj_set_align(ui_ble_nu, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_ble_nu, "0");
-    lv_obj_set_style_text_color(ui_ble_nu, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_ble_nu, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_ble_nu, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_battery = lv_label_create(ui_Screen1);
+    lv_obj_set_width(ui_battery, LV_SIZE_CONTENT);  /// 1
+    lv_obj_set_height(ui_battery, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_battery, -ui_gps_x - 10);       // 右上角 -左移 +右移
+    lv_obj_set_y(ui_battery, ui_gps_y + 10);
+    lv_obj_set_align(ui_battery, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_battery, "0");
+    lv_obj_set_style_text_color(ui_battery, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_battery, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_battery, &lv_font_montserrat_12, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_satellitesText = lv_label_create(ui_Screen1);
     lv_obj_set_width(ui_satellitesText, LV_SIZE_CONTENT);  /// 1

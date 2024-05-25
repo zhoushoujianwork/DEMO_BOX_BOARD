@@ -10,10 +10,7 @@ void loop_led(void *pvParameters)
     for (;;) // A Task shall never return or exit.
     {
         loop_led();
-        lv_timer_handler();
-        lv_set_imu();
         vTaskDelay(100);
-        lv_tick_inc(100);
     }
 }
 
@@ -30,12 +27,10 @@ void task_report(void *pvParameters)
 {
     for (;;) // A Task shall never return or exit.
     {
-        lv_timer_handler();
+        // lv_timer_handler();
         loop_ble();
-        lv_set_gps();
-        lv_set_battery();
         vTaskDelay(500);
-        lv_tick_inc(500);
+        // lv_tick_inc(500);
     }
 }
 
@@ -79,4 +74,12 @@ void init_task()
 
 void loop_task()
 {
+
+    lv_set_gps();
+    lv_set_battery();
+    lv_set_imu();
+
+    lv_timer_handler();
+    vTaskDelay(10);
+    lv_tick_inc(10);
 }

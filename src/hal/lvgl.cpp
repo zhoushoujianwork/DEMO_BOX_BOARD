@@ -65,58 +65,30 @@ void lv_set_gps()
     // 设置速度
     lv_set_speed(get_gps_data()->speed);
 
-    // 设置时间 1992-03-01 21:21:30
+    // 设置本地时间
     lv_label_set_text_fmt(ui_gpsTime, "%4d-%02d-%02d %02d:%02d:%02d", get_gps_data()->year, get_gps_data()->month, get_gps_data()->day, get_gps_data()->hour, get_gps_data()->minute, get_gps_data()->second);
-    Serial.printf("%4d-%02d-%02d %02d:%02d:%02d", get_gps_data()->year, get_gps_data()->month, get_gps_data()->day, get_gps_data()->hour, get_gps_data()->minute, get_gps_data()->second);
+    Serial.printf("gps_time %4d-%02d-%02d %02d:%02d:%02d\n", get_gps_data()->year, get_gps_data()->month, get_gps_data()->day, get_gps_data()->hour, get_gps_data()->minute, get_gps_data()->second);
     // 设置经纬度
-    lv_label_set_text_fmt(ui_gpsText, "%d %d", get_gps_data()->lng, get_gps_data()->lat);
-    Serial.printf("%d %d", get_gps_data()->lng, get_gps_data()->lat);
+    lv_label_set_text_fmt(ui_gpsText, "%s,%s", String(get_gps_data()->lng, 6), String(get_gps_data()->lat, 6));
 
     // 设置高度
-    lv_label_set_text_fmt(ui_altitudeText, "%3dm", get_gps_data()->altitude);
-    Serial.println("altitude: " + String(get_gps_data()->altitude));
+    lv_label_set_text_fmt(ui_altitudeText, "%sm", String(get_gps_data()->altitude, 2));
 
     // 设置方向
-    lv_label_set_text_fmt(ui_courseText, "%d", get_gps_data()->direction);
-    Serial.println("direction: " + String(get_gps_data()->direction));
+    lv_label_set_text_fmt(ui_courseText, "%s", String(get_gps_data()->direction, 0));
 
     // 设置卫星数量
-    lv_label_set_text_fmt(ui_satellitesText, "%d", get_gps_data()->satellites);
-    Serial.println("satellites: " + String(get_gps_data()->satellites));
-}
-
-// 定义平均滤波数组大小
-#define FILTER_SIZE 4      // 缓冲区大小 和刷新速度有关 越快越小，否则会有延迟
-float buffer[FILTER_SIZE]; // 缓冲区
-int roll_index = 0;        // 缓冲区索引
-
-// 添加新数据到缓冲区中
-void addData(float newData)
-{
-    buffer[roll_index] = newData;
-    // 循环更新缓冲区索引
-    roll_index = (roll_index + 1) % FILTER_SIZE;
-}
-
-// 计算平均值
-float getFilteredData()
-{
-    float average = 0;
-    for (int i = 0; i < FILTER_SIZE; i++)
-    {
-        average += buffer[i];
-    }
-    return average / FILTER_SIZE;
+    lv_label_set_text_fmt(ui_satellitesText, "%d", int(get_gps_data()->satellites));
 }
 
 void lv_set_imu()
 {
-    // 设置加速度
-    // lv_label_set_text_fmt(ui_accelText, "%d %d %d", get_imu_data()->ax, get_imu_data()->ay, get_imu_data()->az);
-    // roll = atan(aY / sqrt(aX * aX + aZ * aZ)) * 180.0 / PI;
-    addData(atan(get_imu_data()->ay / sqrt(get_imu_data()->ax * get_imu_data()->ax + get_imu_data()->az * get_imu_data()->az) * 180.0 / PI)); // 将数据放入缓冲区
-    float filteredData = getFilteredData();                                                                                                   // 获取平均值作为最终数据
-    lv_label_set_text_fmt(ui_rollText, "%d", filteredData);                                                                                   // 显示数据
+    float roll = map(get_imu_data()->pitch, -10, 10, -90, 90);
+    lv_label_set_text_fmt(ui_rollText, "%s", String(roll, 0));
+    // obj – pointer to an image object
+    // angle – rotation angle in degree with 0.1 degree resolution (0..3600: clock wise)
+    lv_img_set_angle(ui_roll, map(roll, -90, 90, 0 - 900, 3600 / 2 - 900));
+    Serial.println("roll: " + String(roll, 0));
 }
 
 void lv_set_battery()
@@ -125,9 +97,8 @@ void lv_set_battery()
     // if (!get_device_state()->gps_state)
 
     // if (!get_device_state()->imu_state)
-
     if (get_device_state()->battery)
-        lv_label_set_text_fmt(ui_ble_nu, "%2d", get_device_state()->battery);
+        lv_label_set_text_fmt(ui_battery, "%2d", get_device_state()->battery);
 
     // if (!get_device_state()->temperature)
 }

@@ -34,6 +34,9 @@ typedef struct
     float gx;
     float gy;
     float gz;
+    float roll;
+    float pitch;
+    float yaw;
     float temperature;
 } imu_data_t;
 

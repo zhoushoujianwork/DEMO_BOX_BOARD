@@ -177,6 +177,9 @@ void loop_ble()
                 get_imu_data()->ax = ((imu_data_t *)value.data())->ax;
                 get_imu_data()->ay = ((imu_data_t *)value.data())->ay;
                 get_imu_data()->az = ((imu_data_t *)value.data())->az;
+                get_imu_data()->roll = ((imu_data_t *)value.data())->roll;
+                get_imu_data()->pitch = ((imu_data_t *)value.data())->pitch;
+                get_imu_data()->yaw = ((imu_data_t *)value.data())->yaw;
                 get_imu_data()->temperature = ((imu_data_t *)value.data())->temperature;
             }
             else
