@@ -6,11 +6,7 @@
 #include "ui/ui.h"
 
 void setup_lvgl();
-
-void lv_set_gps();
-
-void lv_set_imu();
-
-void lv_set_battery();
+void sync_speed(double v);
+void lv_flash();
 
 #endif

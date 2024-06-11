@@ -8,5 +8,5 @@
 #include "em_hal.h"
 
 void setup_ble();
-void loop_ble();
+void ble_read_from_server();
 #endif

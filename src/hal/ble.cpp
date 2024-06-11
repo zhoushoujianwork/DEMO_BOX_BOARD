@@ -26,13 +26,9 @@ static void notifyCallback(
     Serial.print(pBLERemoteCharacteristic->getUUID().toString().c_str());
     Serial.print(" of data length ");
     Serial.println(length);
-    Serial.print("data: ");
-    Serial.println((char *)pData);
     if (length == sizeof(device_state_t))
     {
         memcpy(get_device_state(), pData, sizeof(device_state_t));
-        Serial.println("set device state");
-        Serial.println(get_device_state()->battery);
     }
 }
 
@@ -131,7 +127,6 @@ void setup_ble()
 {
     Serial.println("Starting Arduino BLE Client application...");
     BLEDevice::init("");
-
     BLEScan *pBLEScan = BLEDevice::getScan();
     pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
     pBLEScan->setInterval(1349);
@@ -141,7 +136,7 @@ void setup_ble()
 }
 
 // This is the Arduino main loop function.
-void loop_ble()
+void ble_read_from_server()
 {
     // Serial.printf("\ndoConnect = %d, connected = %d, doScan = %d\n", doConnect, connected, doScan);
     // If the flag "doConnect" is true then we have scanned for and found the desired
@@ -218,5 +213,4 @@ void loop_ble()
         Serial.println("scanning");
         BLEDevice::getScan()->start(0); // this is just eample to start scan after disconnect, most likely there is better way to do it in arduino
     }
-
-} // End of loop
+}
