@@ -132,13 +132,14 @@ void setup_ble()
     pBLEScan->setInterval(1349);
     pBLEScan->setWindow(449);
     pBLEScan->setActiveScan(true);
-    pBLEScan->start(0, false);
+    // pBLEScan->start(0, false);
 }
 
 // This is the Arduino main loop function.
 void ble_read_from_server()
 {
     // Serial.printf("\ndoConnect = %d, connected = %d, doScan = %d\n", doConnect, connected, doScan);
+
     // If the flag "doConnect" is true then we have scanned for and found the desired
     // BLE Server with which we wish to connect.  Now we connect to it.  Once we are
     // connected we set the connected flag to be true.
@@ -160,6 +161,7 @@ void ble_read_from_server()
     // with the current time since boot.
     if (connected)
     {
+        get_device_state()->bleConnected = true;
         // read
         if (pRemoteIMUCharacteristic->canRead())
         {
@@ -210,7 +212,14 @@ void ble_read_from_server()
     }
     else if (doScan)
     {
+        get_device_state()->bleConnected = false;
         Serial.println("scanning");
-        BLEDevice::getScan()->start(0); // this is just eample to start scan after disconnect, most likely there is better way to do it in arduino
+        BLEDevice::getScan()->start(10, false);
+        doScan = false;
+    }
+
+    if (doConnect != true && connected != true && doScan != true)
+    {
+        doScan = true;
     }
 }

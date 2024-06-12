@@ -33,6 +33,7 @@ void init_device_state()
     memset(&g_device_state, 0, sizeof(device_state_t));
     g_device_state.imu_state = STATUS_LACK;
     g_device_state.gps_state = STATUS_LACK;
+    g_device_state.bleConnected = false;
     g_device_state.battery = 13;
     g_device_state.temperature = 30;
 

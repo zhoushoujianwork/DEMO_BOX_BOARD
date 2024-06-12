@@ -37,8 +37,9 @@ void test_thread(void *pvParameters)
     for (;;) // A Task shall never return or exit.
     {
         // 随机 0-299一个数据 double
-        // sync_speed(rand() % 300);
-        lv_flash();
+        sync_speed(rand() % 300);
+        // lv_flash();
+
         vTaskDelay(100);
     }
 }
@@ -46,6 +47,7 @@ void test_thread(void *pvParameters)
 void init_task()
 {
     Serial.begin(115200);
+
     setup_led();
     setup_bat();
     setup_btn();
@@ -94,6 +96,6 @@ void loop_task()
     long last_time = millis();
     lv_timer_handler(); // Handle LVGL tasks
     // lv_flash();
-    delay(5); // Wait for 5 milliseconds before the next iteration
+    // delay(5); // Wait for 5 milliseconds before the next iteration
     lv_tick_inc(int(millis() - last_time));
 }

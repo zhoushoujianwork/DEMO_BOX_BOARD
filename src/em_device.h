@@ -44,6 +44,7 @@ typedef struct
 {
     uint8_t battery;
     uint8_t temperature;
+    bool bleConnected;
     state_e gps_state;
     state_e imu_state;
 } device_state_t;

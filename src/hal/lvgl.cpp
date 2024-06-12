@@ -2,11 +2,10 @@
 #include <TFT_eSPI.h>
 
 static lv_disp_draw_buf_t draw_buf;
-static lv_color_t buf[TFT_WIDTH * TFT_HEIGHT / 10];
 
 TFT_eSPI tft = TFT_eSPI(); /* TFT instance */
 
-#if LV_USE_LOG != 1
+#if LV_USE_LOG == 1
 /* Serial debugging */
 void my_print(const char *buf)
 {
@@ -77,16 +76,18 @@ void init_speed_dashboard(void *param)
     /* MANDATORY SETTINGS
      *------------------*/
     lv_anim_set_exec_cb(&a, set_speed);
-    // lv_anim_set_time(&a, 1000);
-    lv_anim_speed_to_time(2, 0, 299);
+    lv_anim_set_time(&a, 1000);
+    // lv_anim_speed_to_time(2, 0, 299);
     lv_anim_set_playback_delay(&a, 100);
     lv_anim_set_playback_time(&a, 1000);
     lv_anim_set_var(&a, ui_speed);
     lv_anim_set_values(&a, 0, 299);
     lv_anim_set_repeat_count(&a, 1);
+    lv_anim_path_ease_in_out(&a);
     /* START THE ANIMATION
      *------------------*/
     lv_anim_start(&a);
+    delay(3000);
 }
 
 // 判断是否还在 init 动画展示阶段，是则不再展示动画
@@ -97,6 +98,12 @@ void sync_speed(double v)
 
 void lv_flash()
 {
+    if (!get_device_state()->bleConnected)
+    {
+        lv_label_set_text_fmt(ui_localtionText, "ble lost");
+        return;
+    }
+    lv_label_set_text_fmt(ui_localtionText, "SuZhou, China");
     // 设置速度
     sync_speed(get_gps_data()->speed);
 
@@ -123,18 +130,10 @@ void lv_flash()
     if (get_device_state()->battery)
         lv_label_set_text_fmt(ui_battery, "%2d", get_device_state()->battery);
 
-    Serial.printf("debug: %s %4d-%02d-%02d %02d:%02d:%02d %s,%s %d %s %d\n", String(roll, 0),
+    Serial.printf("debug: %d(bat) %s(roll) %4d-%02d-%02d %02d:%02d:%02d %s,%s %d %s %d\n", get_device_state()->battery, String(roll, 0),
                   get_gps_data()->year, get_gps_data()->month, get_gps_data()->day, get_gps_data()->hour, get_gps_data()->minute, get_gps_data()->second,
                   String(get_gps_data()->lng, 6), String(get_gps_data()->lat, 6), int(get_gps_data()->altitude), String(get_gps_data()->direction, 0), int(get_gps_data()->satellites));
 }
-
-#if LV_USE_LOG != 0
-void my_print(const char *buf)
-{
-    Serial.printf(buf);
-    Serial.flush();
-}
-#endif
 
 void setup_lvgl()
 {
@@ -153,9 +152,10 @@ void setup_lvgl()
     LVGL_Arduino += String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
     Serial.println(LVGL_Arduino);
 
-    lv_disp_draw_buf_init(&draw_buf, buf, NULL, TFT_WIDTH * TFT_HEIGHT / 10);
-
+    uint32_t size_in_px = TFT_WIDTH * TFT_HEIGHT / 8;
+    static lv_color_t buf[TFT_WIDTH * TFT_HEIGHT / 8];
     static lv_disp_drv_t disp_drv;
+    lv_disp_draw_buf_init(&draw_buf, buf, NULL, size_in_px);
     lv_disp_drv_init(&disp_drv);
     disp_drv.hor_res = TFT_HEIGHT;
     disp_drv.ver_res = TFT_WIDTH;
