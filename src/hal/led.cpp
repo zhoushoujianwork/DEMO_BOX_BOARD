@@ -12,6 +12,8 @@ void setup_led()
 {
   pinMode(LedPin, OUTPUT);
   digitalWrite(LedPin, LOW);
+
+  blinkLed();
 }
 
 void loop_led()

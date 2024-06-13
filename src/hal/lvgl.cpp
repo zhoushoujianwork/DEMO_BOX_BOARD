@@ -1,169 +1,144 @@
+/*Using LVGL with Arduino requires some extra steps:
+ *Be sure to read the docs here: https://docs.lvgl.io/master/integration/framework/arduino.html  */
+
 #include "lvgl.h"
+
+#if LV_USE_TFT_ESPI
 #include <TFT_eSPI.h>
+#endif
 
-static lv_disp_draw_buf_t draw_buf;
+/*To use the built-in examples and demos of LVGL uncomment the includes below respectively.
+ *You also need to copy `lvgl/examples` to `lvgl/src/examples`. Similarly for the demos `lvgl/demos` to `lvgl/src/demos`.
+ *Note that the `lv_examples` library is for LVGL v7 and you shouldn't install it for this version (since LVGL v8)
+ *as the examples and demos are now part of the main LVGL library. */
 
-TFT_eSPI tft = TFT_eSPI(); /* TFT instance */
+#include <examples/lv_examples.h>
+#include <demos/lv_demos.h>
 
-#if LV_USE_LOG == 1
-/* Serial debugging */
-void my_print(const char *buf)
+/*Set to your screen resolution and rotation*/
+#define TFT_HOR_RES 172
+#define TFT_VER_RES 320
+#define TFT_ROTATION LV_DISPLAY_ROTATION_90
+
+/*LVGL draw into this buffer, 1/10 screen size usually works well. The size is in bytes*/
+#define DRAW_BUF_SIZE (TFT_HOR_RES * TFT_VER_RES / 10 * (LV_COLOR_DEPTH / 8))
+uint32_t draw_buf[DRAW_BUF_SIZE / 4];
+
+#if LV_USE_LOG != 0
+void my_print(lv_log_level_t level, const char *buf)
 {
-    Serial.printf(buf);
+    LV_UNUSED(level);
+    Serial.println(buf);
     Serial.flush();
 }
 #endif
 
-/* Display flushing */
-static void my_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p)
+/* LVGL calls it when a rendered image needs to copied to the display*/
+void my_disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
 {
-    uint32_t w = (area->x2 - area->x1 + 1);
-    uint32_t h = (area->y2 - area->y1 + 1);
+    /*Copy `px map` to the `area`*/
 
-    tft.startWrite();
-    tft.setAddrWindow(area->x1, area->y1, w, h);
-    tft.pushColors((uint16_t *)&color_p->full, w * h, true);
-    tft.endWrite();
+    /*For example ("my_..." functions needs to be implemented by you)
+    uint32_t w = lv_area_get_width(area);
+    uint32_t h = lv_area_get_height(area);
 
-    lv_disp_flush_ready(disp_drv);
+    my_set_window(area->x1, area->y1, w, h);
+    my_draw_bitmaps(px_map, w * h);
+     */
+
+    /*Call it to tell LVGL you are ready*/
+    lv_display_flush_ready(disp);
 }
 
-static void lv_demo_text(String txt)
+/*Read the touchpad*/
+void my_touchpad_read(lv_indev_t *indev, lv_indev_data_t *data)
 {
-    /*Create a simple text, background is back,text is white*/
-    lv_obj_t *label = lv_label_create(lv_scr_act());
-    // 黑色背景
-    // lv_obj_set_style_bg_color(label, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    // lv_obj_set_style_text_color(label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_label_set_text(label, txt.c_str());      // 设置文本
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0); // 居中显示
-    lv_timer_handler();
-    lv_tick_inc(1000);
-    delay(2000);
-}
+    /*For example  ("my_..." functions needs to be implemented by you)
+    int32_t x, y;
+    bool touched = my_get_touch( &x, &y );
 
-static void set_speed(void *obj, int32_t v)
-{
-    lv_arc_set_value((lv_obj_t *)obj, (int16_t)v);
+    if(!touched) {
+        data->state = LV_INDEV_STATE_RELEASED;
+    } else {
+        data->state = LV_INDEV_STATE_PRESSED;
 
-    lv_label_set_text_fmt(ui_speedText, "%d", int(v));
-    if (v < 40)
-    {
-        lv_obj_set_style_arc_color(ui_speed, lv_color_hex(0x2274C2), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+        data->point.x = x;
+        data->point.y = y;
     }
-    else if (v < 80)
-    {
-        lv_obj_set_style_arc_color(ui_speed, lv_color_hex(0x0A9F62), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    }
-    else if (v < 120)
-    {
-        lv_obj_set_style_arc_color(ui_speed, lv_color_hex(0xEF1616), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    }
-    else
-    {
-        lv_obj_set_style_arc_color(ui_speed, lv_color_hex(0xEF1616), LV_PART_INDICATOR | LV_STATE_DEFAULT);
-    };
+     */
 }
 
-// 开机初始化动画仪表展示。
-void init_speed_dashboard(void *param)
+/*use Arduinos millis() as tick source*/
+static uint32_t my_tick(void)
 {
-    /* INITIALIZE AN ANIMATION
-     *-----------------------*/
-    lv_anim_t a;
-    lv_anim_init(&a);
-
-    /* MANDATORY SETTINGS
-     *------------------*/
-    lv_anim_set_exec_cb(&a, set_speed);
-    lv_anim_set_time(&a, 1000);
-    // lv_anim_speed_to_time(2, 0, 299);
-    lv_anim_set_playback_delay(&a, 100);
-    lv_anim_set_playback_time(&a, 1000);
-    lv_anim_set_var(&a, ui_speed);
-    lv_anim_set_values(&a, 0, 299);
-    lv_anim_set_repeat_count(&a, 1);
-    lv_anim_path_ease_in_out(&a);
-    /* START THE ANIMATION
-     *------------------*/
-    lv_anim_start(&a);
-    delay(3000);
-}
-
-// 判断是否还在 init 动画展示阶段，是则不再展示动画
-void sync_speed(double v)
-{
-    set_speed(ui_speed, int(v));
-}
-
-void lv_flash()
-{
-    if (!get_device_state()->bleConnected)
-    {
-        lv_label_set_text_fmt(ui_localtionText, "ble lost");
-        return;
-    }
-    lv_label_set_text_fmt(ui_localtionText, "SuZhou, China");
-    // 设置速度
-    sync_speed(get_gps_data()->speed);
-
-    // 设置本地时间
-    lv_label_set_text_fmt(ui_gpsTime, "%4d-%02d-%02d %02d:%02d:%02d", get_gps_data()->year, get_gps_data()->month, get_gps_data()->day, get_gps_data()->hour, get_gps_data()->minute, get_gps_data()->second);
-    // 设置经纬度
-    lv_label_set_text_fmt(ui_gpsText, "%s,%s", String(get_gps_data()->lng, 6), String(get_gps_data()->lat, 6));
-
-    // 设置高度
-    lv_label_set_text_fmt(ui_altitudeText, "%sm", String(get_gps_data()->altitude, 2));
-
-    // 设置方向
-    lv_label_set_text_fmt(ui_courseText, "%s", String(get_gps_data()->direction, 0));
-
-    // 设置卫星数量
-    lv_label_set_text_fmt(ui_satellitesText, "%d", int(get_gps_data()->satellites));
-
-    float roll = map(get_imu_data()->roll, -10, 10, -90, 90);
-    // roll调整角度
-    // roll = roll;
-    lv_label_set_text_fmt(ui_rollText, "%s", String(roll, 0));
-    lv_img_set_angle(ui_roll, map(roll, -90, 90, 0 - 900, 3600 / 2 - 900));
-
-    if (get_device_state()->battery)
-        lv_label_set_text_fmt(ui_battery, "%2d", get_device_state()->battery);
-
-    Serial.printf("debug: %d(bat) %s(roll) %4d-%02d-%02d %02d:%02d:%02d %s,%s %d %s %d\n", get_device_state()->battery, String(roll, 0),
-                  get_gps_data()->year, get_gps_data()->month, get_gps_data()->day, get_gps_data()->hour, get_gps_data()->minute, get_gps_data()->second,
-                  String(get_gps_data()->lng, 6), String(get_gps_data()->lat, 6), int(get_gps_data()->altitude), String(get_gps_data()->direction, 0), int(get_gps_data()->satellites));
+    return millis();
 }
 
 void setup_lvgl()
 {
-    Serial.println("TFT w*h:" + String(TFT_WIDTH) + "*" + String(TFT_HEIGHT));
-    Serial.println("SDA:" + String(TFT_MOSI) + " SCL:" + String(TFT_SCLK) + " CS:" + String(TFT_CS) + " DC:" + String(TFT_DC) + " RST:" + String(TFT_RST));
+    String LVGL_Arduino = "Hello Arduino! ";
+    LVGL_Arduino += String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
+
+    Serial.println(LVGL_Arduino);
 
     lv_init();
+
+    /*Set a tick source so that LVGL will know how much time elapsed. */
+    lv_tick_set_cb(my_tick);
+
+    /* register print function for debugging */
 #if LV_USE_LOG != 0
     lv_log_register_print_cb(my_print);
 #endif
 
-    tft.begin();
-    tft.setRotation(TFT_ROTATION);
+    lv_display_t *disp;
+#if LV_USE_TFT_ESPI
+    /*TFT_eSPI can be enabled lv_conf.h to initialize the display in a simple way*/
+    disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
+    lv_display_set_rotation(disp, TFT_ROTATION);
 
-    String LVGL_Arduino = "Hello Arduino LVGL!";
-    LVGL_Arduino += String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
-    Serial.println(LVGL_Arduino);
+#else
+    /*Else create a display yourself*/
+    disp = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
+    lv_display_set_flush_cb(disp, my_disp_flush);
+    lv_display_set_buffers(disp, draw_buf, NULL, sizeof(draw_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
+#endif
 
-    uint32_t size_in_px = TFT_WIDTH * TFT_HEIGHT / 8;
-    static lv_color_t buf[TFT_WIDTH * TFT_HEIGHT / 8];
-    static lv_disp_drv_t disp_drv;
-    lv_disp_draw_buf_init(&draw_buf, buf, NULL, size_in_px);
-    lv_disp_drv_init(&disp_drv);
-    disp_drv.hor_res = TFT_HEIGHT;
-    disp_drv.ver_res = TFT_WIDTH;
-    disp_drv.flush_cb = my_disp_flush;
-    disp_drv.draw_buf = &draw_buf;
-    lv_disp_drv_register(&disp_drv);
+    /*Initialize the (dummy) input device driver*/
+    lv_indev_t *indev = lv_indev_create();
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
+    lv_indev_set_read_cb(indev, my_touchpad_read);
 
-    ui_init();
-    int initial_value = 0; // 初始值
-    init_speed_dashboard(&initial_value);
+    /* Create a simple label
+     * ---------------------
+     lv_obj_t *label = lv_label_create( lv_screen_active() );
+     lv_label_set_text( label, "Hello Arduino, I'm LVGL!" );
+     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
+
+     * Try an example. See all the examples
+     *  - Online: https://docs.lvgl.io/master/examples.html
+     *  - Source codes: https://github.com/lvgl/lvgl/tree/master/examples
+     * ----------------------------------------------------------------
+
+     lv_example_btn_1();
+
+     * Or try out a demo. Don't forget to enable the demos in lv_conf.h. E.g. LV_USE_DEMOS_WIDGETS
+     * -------------------------------------------------------------------------------------------
+
+     lv_demo_widgets();
+     */
+
+    // lv_obj_t *label = lv_label_create(lv_screen_active());
+    // lv_label_set_text(label, "Hello Arduino, I'm LVGL!");
+    // lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+
+    // lv_demo_widgets();
+
+    // lv_demo_music();
+
+    // lv_example_button_1();
+
+    ui_screen_a_init();
+
+    Serial.println("Setup done");
 }

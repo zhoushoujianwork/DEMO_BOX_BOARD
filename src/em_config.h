@@ -18,7 +18,4 @@
 #define CHARACTERISTIC_UUID_GPS "beb5483e-36e1-4688-b7f5-ea07361b2601" // 自定义打印UUID
 #define CHARACTERISTIC_UUID_IMU "beb5483e-36e1-4688-b7f5-ea07361b2602" // 自定义打印UUID
 
-// SPI
-#define TFT_ROTATION 3 // 0 1 2 3 代表 0 90 180 270
-
 #endif
