@@ -9,19 +9,19 @@ static void set_speed(void *obj, int32_t v)
     lv_label_set_text_fmt(ui_speedText, "%d", int(v));
     if (v < 40)
     {
-        lv_obj_set_style_arc_color(ui_speed, lv_color_hex(0x2274C2), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+        lv_obj_set_style_arc_color(ui_speed_arc, lv_color_hex(0x2274C2), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     }
     else if (v < 80)
     {
-        lv_obj_set_style_arc_color(ui_speed, lv_color_hex(0x0A9F62), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+        lv_obj_set_style_arc_color(ui_speed_arc, lv_color_hex(0x0A9F62), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     }
     else if (v < 120)
     {
-        lv_obj_set_style_arc_color(ui_speed, lv_color_hex(0xEF1616), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+        lv_obj_set_style_arc_color(ui_speed_arc, lv_color_hex(0xEF1616), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     }
     else
     {
-        lv_obj_set_style_arc_color(ui_speed, lv_color_hex(0xEF1616), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+        lv_obj_set_style_arc_color(ui_speed_arc, lv_color_hex(0xEF1616), LV_PART_INDICATOR | LV_STATE_DEFAULT);
     };
 }
 
@@ -58,11 +58,8 @@ void lv_flash()
 }
 */
 
-
-
 void ui_init(void)
 {
-    lv_disp_t *dispp = lv_disp_get_default();
-    lv_theme_t *theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), false, LV_FONT_DEFAULT);
-    lv_disp_set_theme(dispp, theme);
+    // lv_example_grid_5();
+    static_screen();
 }

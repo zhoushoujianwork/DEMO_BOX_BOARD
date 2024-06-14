@@ -12,8 +12,8 @@
  *Note that the `lv_examples` library is for LVGL v7 and you shouldn't install it for this version (since LVGL v8)
  *as the examples and demos are now part of the main LVGL library. */
 
-#include <examples/lv_examples.h>
-#include <demos/lv_demos.h>
+// #include <examples/lv_examples.h>
+// #include <demos/lv_demos.h>
 
 /*Set to your screen resolution and rotation*/
 #define TFT_HOR_RES 172
@@ -136,9 +136,7 @@ void setup_lvgl()
 
     // lv_demo_music();
 
-    // lv_example_button_1();
-
-    ui_screen_a_init();
+    ui_init();
 
     Serial.println("Setup done");
 }
