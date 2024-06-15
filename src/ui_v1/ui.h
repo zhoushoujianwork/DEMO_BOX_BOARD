@@ -7,12 +7,11 @@ static lv_obj_t *ui_Screen_A;
 static lv_obj_t *ui_speed_arc;
 static lv_obj_t *ui_speedText;
 
-void ui_init(void);
-void lv_example_grid_5(void);
+void _lv_example_grid_5(void);
 void lv_example_grid_1(void);
 void lv_example_event_4(void);
 void static_screen(void);
 
-void _set_ui_speed_anim(void *obj, int32_t v);
-
+extern void _set_arc_value(int32_t v);
+extern void ui_init(void);
 #endif

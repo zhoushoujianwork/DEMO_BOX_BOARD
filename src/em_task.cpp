@@ -10,6 +10,7 @@ void loop_btn(void *pvParameters)
     for (;;) // A Task shall never return or exit.
     {
         vTaskDelay(10);
+        loop_btn();
     }
 }
 
@@ -17,7 +18,7 @@ void task_report(void *pvParameters)
 {
     for (;;) // A Task shall never return or exit.
     {
-        ble_read_from_server();
+        ble_read_from_server(); // 会阻塞
         vTaskDelay(5);
     }
 }
@@ -26,13 +27,11 @@ void init_task()
 {
     Serial.begin(115200);
 
+    setup_ble();
     setup_led();
     setup_btn();
     setup_lvgl();
-    // setup_bat();
-    return;
-
-    setup_ble();
+    // return;
     xTaskCreate(
         loop_btn,   // 任务函数
         "BTN_TASK", // 任务名
@@ -54,9 +53,9 @@ void init_task()
 
 void loop_task()
 {
-    // long last_time = millis();
+    int32_t speed = random(0, 121);
+    // Serial.printf("_set_arc_value %d", speed);
+    _set_arc_value(speed);
     lv_timer_handler(); // Handle LVGL tasks
-    loop_btn();
-    delay(5); // Wait for 5 milliseconds before the next iteration
-    // lv_tick_inc(int(millis() - last_time));
+    delay(5);           // Wait for 5 milliseconds before the next iteration
 }

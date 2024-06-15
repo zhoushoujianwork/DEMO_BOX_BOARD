@@ -1,12 +1,5 @@
 #include "em_config.h"
 
-void adc_init()
-{
-    pinMode(PIN_BAT_EN, OUTPUT);       // ADC使能引脚
-    digitalWrite(PIN_BAT_EN, LOW);     // 关闭ADC
-    analogReadResolution(PIN_BAT_BIT); // ADC采样次数，默认就是12位
-}
-
 int get_adc_volts()
 {
     // int analogValue = analogRead(PIN_BATTERY_ADC);
@@ -20,9 +13,4 @@ void read_battery()
 {
     long battery = map(get_adc_volts() * 2, 3300, 4200, 0, 100);
     Serial.printf("battery = %d\t", battery);
-}
-
-void setup_bat()
-{
-    adc_init();
 }

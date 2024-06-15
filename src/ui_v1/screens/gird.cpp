@@ -47,7 +47,7 @@ void lv_example_grid_1(void)
 /**
  * Demonstrate column and row gap
  */
-void lv_example_grid_5(void)
+void _lv_example_grid_5(void)
 {
 
     /*60x60 cells*/

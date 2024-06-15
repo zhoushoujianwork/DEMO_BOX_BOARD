@@ -60,6 +60,6 @@ void lv_flash()
 
 void ui_init(void)
 {
-    // lv_example_grid_5();
+    // _lv_example_grid_5();
     static_screen();
 }
