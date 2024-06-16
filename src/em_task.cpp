@@ -65,5 +65,5 @@ void loop_task()
     }
 
     lv_timer_handler(); // Handle LVGL tasks
-    delay(500);         // Wait for 5 milliseconds before the next iteration
+    delay(5);           // Wait for 5 milliseconds before the next iteration
 }

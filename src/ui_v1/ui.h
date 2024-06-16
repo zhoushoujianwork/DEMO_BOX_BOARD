@@ -4,13 +4,6 @@
 #include "em_config.h"
 #include "em_device.h"
 
-static lv_obj_t *cont;
-static lv_obj_t *ui_speed_arc;
-static lv_obj_t *ui_speedText;
-static lv_obj_t *label_gps_time;
-static lv_obj_t *label_gps_nu;
-static lv_obj_t *label_gps_latlon;
-
 void _lv_example_grid_5(void);
 void lv_example_grid_1(void);
 void lv_example_event_4(void);
