@@ -136,7 +136,7 @@ void setup_lvgl()
 
     // lv_demo_music();
 
-    ui_init();
+    _ui_init();
 
     Serial.println("Setup done");
 }

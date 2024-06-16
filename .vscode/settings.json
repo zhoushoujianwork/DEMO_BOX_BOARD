@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "cmath": "cpp",
-        "lv_examples.h": "c"
+        "lv_examples.h": "c",
+        "chrono": "cpp",
+        "algorithm": "cpp"
     }
 }

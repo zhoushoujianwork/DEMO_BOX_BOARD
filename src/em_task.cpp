@@ -53,9 +53,17 @@ void init_task()
 
 void loop_task()
 {
-    int32_t speed = random(0, 121);
-    // Serial.printf("_set_arc_value %d", speed);
-    _set_arc_value(speed);
+    if (0)
+    {
+        int32_t speed = random(0, 199);
+        // Serial.printf("_set_arc_value %d", speed);
+        _set_arc_value(speed);
+    }
+    else
+    {
+        ui_flash();
+    }
+
     lv_timer_handler(); // Handle LVGL tasks
-    delay(5);           // Wait for 5 milliseconds before the next iteration
+    delay(500);         // Wait for 5 milliseconds before the next iteration
 }
