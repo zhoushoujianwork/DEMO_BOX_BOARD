@@ -13,12 +13,15 @@ static lv_obj_t *label_gps_time;
 static lv_obj_t *label_gps_nu;
 static lv_obj_t *label_gps_latlon;
 static lv_obj_t *ui_speed_arc;
+static lv_obj_t *label_gyro;
 static lv_obj_t *ui_speedText;
 static lv_obj_t *ui_speedUnit;
 
 static lv_obj_t *label_bluetooth;
 static lv_obj_t *label_battery;
 static lv_obj_t *label_gps;
+
+#define USE_DOT_FOR_GYRO 1
 
 // 全局变量，用于跟踪背景闪烁动画是否运行
 static bool bg_danger_anim_running = false;
@@ -132,16 +135,30 @@ void _init_board(void)
     }
 }
 
+void _set_gyro_value(imu_data_t data)
+{
+#ifdef USE_DOT_FOR_GYRO
+    // 设置文本基于当前位置开始位移,活动范围 64 像素内
+    int32_t _roll = map(data.roll, -10, 10, -32, 32);
+    int32_t _pitch = map(data.pitch, -10, 10, -32, 32);
+    // lv_obj_set_pos(label_gyro, _roll, _pitch);
+    lv_obj_align(label_gyro, LV_ALIGN_RIGHT_MID, -60 + _roll, 0 + _pitch);
+#else
+    lv_image_set_rotation(label_gyro, map(value, -10, 10, -1800 / 2, 1800 / 2));
+#endif
+    // Serial.printf("set_gyro_value %d\n", value);
+}
+
 void show_bluetooth(bool connected)
 {
     if (connected)
     {
-        Serial.println("lvgl show bluetooth");
+        // Serial.println("lvgl show bluetooth");
         lv_label_set_text(label_bluetooth, LV_SYMBOL_BLUETOOTH);
     }
     else
     {
-        Serial.println("lvgl show bluetooth close");
+        // Serial.println("lvgl show bluetooth close");
         lv_label_set_text(label_bluetooth, LV_SYMBOL_CLOSE);
     }
 }
@@ -290,7 +307,7 @@ void static_screen(void)
     lv_obj_align(label_gps_time, LV_ALIGN_TOP_MID, 0, 5);
 
     /* gps Lat Lon */
-    label_gps_latlon = lv_label_create(lv_screen_active());
+    label_gps_latlon = lv_label_create(screen_a);
     lv_obj_add_style(label_gps_latlon, &style_text, 0);
     lv_label_set_text_fmt(label_gps_latlon, "%s\n%s", "lat", "lon");
     lv_obj_set_style_text_align(label_gps_latlon, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -299,7 +316,23 @@ void static_screen(void)
     lv_obj_set_style_text_color(label_gps_latlon, lv_color_white(), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(label_gps_latlon, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(label_gps_latlon, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_align(label_gps_latlon, LV_ALIGN_RIGHT_MID, -20, 0);
+    lv_obj_align(label_gps_latlon, LV_ALIGN_BOTTOM_RIGHT, -20, 0);
+
+/* 陀螺仪角度显示 */
+#ifdef USE_DOT_FOR_GYRO
+    // 用点模拟上下左右移动
+    label_gyro = lv_label_create(screen_a);
+    lv_obj_add_style(label_gyro, &style_text, 0);
+    lv_label_set_text(label_gyro, LV_SYMBOL_PLUS);
+#else
+    // 用图片模拟
+    LV_IMAGE_DECLARE(LV_MOTO);
+    label_gyro = lv_image_create(screen_a);
+    lv_image_set_src(label_gyro, &LV_MOTO);
+    lv_obj_set_style_opa(label_gyro, LV_OPA_100, 0);              // 透明度设置为 100
+    lv_obj_set_style_image_recolor_opa(label_gyro, LV_OPA_30, 0); // 透明度设置为 100
+#endif
+    lv_obj_align(label_gyro, LV_ALIGN_RIGHT_MID, -60, 0);
 
     /* EVENT */
     lv_obj_add_event_cb(ui_speed_arc, _ui_event_speed, LV_EVENT_VALUE_CHANGED, &ui_speedText); // 添加事件回调

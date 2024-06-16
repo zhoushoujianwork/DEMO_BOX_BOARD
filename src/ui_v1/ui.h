@@ -12,8 +12,9 @@ void static_screen(void);
 void show_battery(uint8_t percent);
 void show_bluetooth(bool connected);
 
-extern void _set_arc_value(int32_t v);
-extern void _set_gps_all(gps_data_t data);
-extern void _ui_init(void);
-extern void ui_flash(void);
+void _set_gyro_value(imu_data_t data);
+void _set_arc_value(int32_t v);
+void _set_gps_all(gps_data_t data);
+void _ui_init(void);
+void ui_flash(void);
 #endif
