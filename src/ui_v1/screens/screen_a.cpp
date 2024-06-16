@@ -15,6 +15,7 @@ static lv_obj_t *label_gps_latlon;
 static lv_obj_t *ui_speed_arc;
 static lv_obj_t *ui_speedText;
 static lv_obj_t *ui_speedUnit;
+
 static lv_obj_t *label_bluetooth;
 static lv_obj_t *label_battery;
 static lv_obj_t *label_gps;
@@ -131,6 +132,45 @@ void _init_board(void)
     }
 }
 
+void show_bluetooth(bool connected)
+{
+    if (connected)
+    {
+        Serial.println("lvgl show bluetooth");
+        lv_label_set_text(label_bluetooth, LV_SYMBOL_BLUETOOTH);
+    }
+    else
+    {
+        Serial.println("lvgl show bluetooth close");
+        lv_label_set_text(label_bluetooth, LV_SYMBOL_CLOSE);
+    }
+}
+
+// 5个状态，分别是 20% 40% 60% 80% 100%
+void show_battery(uint8_t percent)
+{
+    if (percent < 20)
+    {
+        lv_label_set_text(label_battery, LV_SYMBOL_BATTERY_EMPTY);
+    }
+    else if (percent < 40)
+    {
+        lv_label_set_text(label_battery, LV_SYMBOL_BATTERY_1);
+    }
+    else if (percent < 60)
+    {
+        lv_label_set_text(label_battery, LV_SYMBOL_BATTERY_2);
+    }
+    else if (percent < 80)
+    {
+        lv_label_set_text(label_battery, LV_SYMBOL_BATTERY_3);
+    }
+    else
+    {
+        lv_label_set_text(label_battery, LV_SYMBOL_BATTERY_FULL);
+    }
+}
+
 void static_screen(void)
 {
 
@@ -145,48 +185,48 @@ void static_screen(void)
     lv_obj_set_size(screen_a, 320, 172);
     lv_disp_load_scr(screen_a);
 
-    if (0)
-    {
-        // Gird 布局
-        static int32_t col_dsc[] = {lv_pct(45), lv_pct(45), LV_GRID_TEMPLATE_LAST};
-        static int32_t row_dsc[] = {12, 150, LV_GRID_TEMPLATE_LAST};
-        lv_obj_set_style_grid_column_dsc_array(screen_a, col_dsc, 0);
-        lv_obj_set_style_grid_row_dsc_array(screen_a, row_dsc, 0);
-        lv_obj_set_layout(screen_a, LV_LAYOUT_GRID);
+    // if (0)
+    // {
+    //     // Gird 布局
+    //     static int32_t col_dsc[] = {lv_pct(45), lv_pct(45), LV_GRID_TEMPLATE_LAST};
+    //     static int32_t row_dsc[] = {12, 150, LV_GRID_TEMPLATE_LAST};
+    //     lv_obj_set_style_grid_column_dsc_array(screen_a, col_dsc, 0);
+    //     lv_obj_set_style_grid_row_dsc_array(screen_a, row_dsc, 0);
+    //     lv_obj_set_layout(screen_a, LV_LAYOUT_GRID);
 
-        // 布局 style
-        static lv_style_t style;
-        lv_style_init(&style);
-        lv_style_set_radius(&style, 20);
-        lv_style_set_bg_color(&style, lv_color_hex(0x05915D));
-        lv_style_set_bg_opa(&style, LV_OPA_COVER);
-        lv_style_set_bg_grad_color(&style, lv_color_hex(0x055088));
-        lv_style_set_bg_grad_dir(&style, LV_GRAD_DIR_VER);
+    //     // 布局 style
+    //     static lv_style_t style;
+    //     lv_style_init(&style);
+    //     lv_style_set_radius(&style, 20);
+    //     lv_style_set_bg_color(&style, lv_color_hex(0x05915D));
+    //     lv_style_set_bg_opa(&style, LV_OPA_COVER);
+    //     lv_style_set_bg_grad_color(&style, lv_color_hex(0x055088));
+    //     lv_style_set_bg_grad_dir(&style, LV_GRAD_DIR_VER);
 
-        left_top_cont = lv_obj_create(screen_a);
-        lv_obj_set_grid_cell(left_top_cont, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
-        lv_obj_add_style(left_top_cont, &style, 0);
-        lv_obj_set_size(left_top_cont, lv_pct(100), lv_pct(100));
-        lv_obj_center(left_top_cont);
+    //     left_top_cont = lv_obj_create(screen_a);
+    //     lv_obj_set_grid_cell(left_top_cont, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
+    //     lv_obj_add_style(left_top_cont, &style, 0);
+    //     lv_obj_set_size(left_top_cont, lv_pct(100), lv_pct(100));
+    //     lv_obj_center(left_top_cont);
 
-        right_top_cont = lv_obj_create(screen_a);
-        lv_obj_set_grid_cell(right_top_cont, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
-        lv_obj_add_style(right_top_cont, &style, 0);
-        lv_obj_set_size(right_top_cont, lv_pct(100), lv_pct(100));
-        lv_obj_center(right_top_cont);
+    //     right_top_cont = lv_obj_create(screen_a);
+    //     lv_obj_set_grid_cell(right_top_cont, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
+    //     lv_obj_add_style(right_top_cont, &style, 0);
+    //     lv_obj_set_size(right_top_cont, lv_pct(100), lv_pct(100));
+    //     lv_obj_center(right_top_cont);
 
-        left_cont = lv_obj_create(screen_a);
-        lv_obj_set_grid_cell(left_cont, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
-        lv_obj_add_style(left_cont, &style, 0);
-        lv_obj_set_size(left_cont, lv_pct(100), lv_pct(100));
-        lv_obj_center(left_cont);
+    //     left_cont = lv_obj_create(screen_a);
+    //     lv_obj_set_grid_cell(left_cont, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
+    //     lv_obj_add_style(left_cont, &style, 0);
+    //     lv_obj_set_size(left_cont, lv_pct(100), lv_pct(100));
+    //     lv_obj_center(left_cont);
 
-        right_cont = lv_obj_create(screen_a);
-        lv_obj_set_grid_cell(right_cont, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
-        lv_obj_add_style(right_cont, &style, 0);
-        lv_obj_set_size(right_cont, lv_pct(100), lv_pct(100));
-        lv_obj_center(right_cont);
-    }
+    //     right_cont = lv_obj_create(screen_a);
+    //     lv_obj_set_grid_cell(right_cont, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
+    //     lv_obj_add_style(right_cont, &style, 0);
+    //     lv_obj_set_size(right_cont, lv_pct(100), lv_pct(100));
+    //     lv_obj_center(right_cont);
+    // }
 
     /* 速度 arc */
     ui_speed_arc = lv_arc_create(lv_screen_active()); // 创建圆弧
@@ -220,14 +260,13 @@ void static_screen(void)
 
     /* bluetooth */
     label_bluetooth = lv_label_create(lv_screen_active());
-    // 设置标签内容为 Bluetooth 符号
     lv_label_set_text(label_bluetooth, LV_SYMBOL_BLUETOOTH);
     lv_obj_add_style(label_bluetooth, &style_text, 0);
     lv_obj_align(label_bluetooth, LV_ALIGN_TOP_RIGHT, -10, 5);
 
     /* battery */
     label_battery = lv_label_create(lv_screen_active());
-    lv_label_set_text(label_battery, LV_SYMBOL_BATTERY_3); // LV_SYMBOL_BATTERY_1 少电，LV_SYMBOL_BATTERY_3 多电
+    lv_label_set_text(label_battery, LV_SYMBOL_BATTERY_EMPTY); // LV_SYMBOL_BATTERY_1 少电，LV_SYMBOL_BATTERY_3 多电
     lv_obj_add_style(label_battery, &style_text, 0);
     lv_obj_align(label_battery, LV_ALIGN_TOP_RIGHT, -30, 5);
 
