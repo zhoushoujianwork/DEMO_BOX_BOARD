@@ -4,7 +4,6 @@ void ui_flash()
 {
     if (!get_device_state()->bleConnected)
     {
-        Serial.println("lvgl return cause ble not connected");
         show_bluetooth(false);
         return;
     }

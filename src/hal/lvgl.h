@@ -6,7 +6,6 @@
 #include "em_device.h"
 #include <lvgl.h>
 
-
 void setup_lvgl();
 
 #endif
