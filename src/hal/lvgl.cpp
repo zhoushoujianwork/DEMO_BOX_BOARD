@@ -32,6 +32,34 @@ void my_print(lv_log_level_t level, const char *buf)
 }
 #endif
 
+void set_angle(int angle)
+{
+    // 0-360
+    lv_disp_t *disp = lv_disp_get_default();
+    Serial.printf("set angle = %d\n", angle);
+    // 添加 LV_EVENT_RESOLUTION_CHANGED 事件
+    return;
+    lv_display_rotation_t rota_angle;
+    if (angle <= 45)
+    {
+        rota_angle = LV_DISPLAY_ROTATION_0;
+    }
+    else if (angle <= 135)
+    {
+        rota_angle = LV_DISPLAY_ROTATION_90;
+    }
+    else if (angle <= 225)
+    {
+        rota_angle = LV_DISPLAY_ROTATION_180;
+    }
+    else
+    {
+        rota_angle = LV_DISPLAY_ROTATION_270;
+    }
+    lv_display_set_rotation(disp, rota_angle);
+    lv_display_send_event(disp, LV_EVENT_RESOLUTION_CHANGED, NULL);
+}
+
 /* LVGL calls it when a rendered image needs to copied to the display*/
 void my_disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
 {
@@ -94,14 +122,14 @@ void setup_lvgl()
 #if LV_USE_TFT_ESPI
     /*TFT_eSPI can be enabled lv_conf.h to initialize the display in a simple way*/
     disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_270);
-
 #else
     /*Else create a display yourself*/
     disp = lv_display_create(TFT_HOR_RES, TFT_VER_RES);
     lv_display_set_flush_cb(disp, my_disp_flush);
     lv_display_set_buffers(disp, draw_buf, NULL, sizeof(draw_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
 #endif
+
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
 
     /*Initialize the (dummy) input device driver*/
     lv_indev_t *indev = lv_indev_create();

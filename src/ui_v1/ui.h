@@ -14,7 +14,7 @@ void show_bluetooth(bool connected);
 
 void _set_gyro_value(imu_data_t data);
 void _set_arc_value(int32_t v);
-void _set_gps_all(gps_data_t data);
+void set_gps_all(gps_data_t data);
 void _ui_init(void);
 void ui_flash(void);
 #endif

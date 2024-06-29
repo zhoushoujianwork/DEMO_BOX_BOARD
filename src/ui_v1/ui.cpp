@@ -10,7 +10,7 @@ void ui_flash()
 
     show_bluetooth(true);
     show_battery(get_device_state()->battery);
-    _set_gps_all(*get_gps_data());
+    set_gps_all(*get_gps_data());
     _set_gyro_value(*get_imu_data());
 }
 

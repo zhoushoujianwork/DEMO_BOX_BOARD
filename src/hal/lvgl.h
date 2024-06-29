@@ -7,5 +7,5 @@
 #include <lvgl.h>
 
 void setup_lvgl();
-
+void set_angle(int angle);
 #endif

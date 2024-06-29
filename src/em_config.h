@@ -18,4 +18,16 @@
 #define CHARACTERISTIC_UUID_GPS "beb5483e-36e1-4688-b7f5-ea07361b2601" // 自定义打印UUID
 #define CHARACTERISTIC_UUID_IMU "beb5483e-36e1-4688-b7f5-ea07361b2602" // 自定义打印UUID
 
+#define USE_DOT_FOR_GYRO 1 // 是否使用点样式显示陀螺仪数据
+
+// 设置微雪 QMI8658 六轴IMU
+#define USE_QMI8658
+#define QMI8658_SDA 6
+#define QMI8658_SCL 7
+
+#ifndef SENSOR_IRQ
+#define QMI8658_IRQ 38
+#endif
+
+#define QMI8658_IMU_CS 5
 #endif

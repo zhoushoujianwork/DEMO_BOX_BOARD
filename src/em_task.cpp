@@ -4,6 +4,7 @@
 #include "hal/ble.h"
 #include "hal/bat.h"
 #include "hal/lvgl.h"
+#include "hal/imu.h"
 
 void loop_btn(void *pvParameters)
 {
@@ -11,6 +12,7 @@ void loop_btn(void *pvParameters)
     {
         vTaskDelay(10);
         loop_btn();
+        loop_imu();
     }
 }
 
@@ -26,11 +28,12 @@ void task_report(void *pvParameters)
 void init_task()
 {
     Serial.begin(115200);
-
+    init_device_state();
     setup_ble();
     setup_led();
     setup_btn();
     setup_lvgl();
+    setup_imu();
     // return;
     xTaskCreate(
         loop_btn,   // 任务函数
