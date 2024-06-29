@@ -65,7 +65,7 @@ void set_gps_all(gps_data_t data)
 
     // float roll = map(get_imu_data()->roll, -10, 10, -90, 90);
 
-    //     Serial.printf("debug: %d(bat) %s(roll) %4d-%02d-%02d %02d:%02d:%02d %s,%s %d %s %d\n", get_device_state()->battery, String(roll, 0),
+    //     Serial.printf("debug: %d(bat) %s(roll) %4d-%02d-%02d %02d:%02d:%02d %s,%s %d %s %d\n", get_remote_device_state()->battery, String(roll, 0),
     //                   get_gps_data()->year, get_gps_data()->month, get_gps_data()->day, get_gps_data()->hour, get_gps_data()->minute, get_gps_data()->second,
     //                   String(get_gps_data()->lng, 6), String(get_gps_data()->lat, 6), int(get_gps_data()->altitude), String(get_gps_data()->direction, 0), int(get_gps_data()->satellites));
 }

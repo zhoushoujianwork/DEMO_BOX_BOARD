@@ -2,14 +2,14 @@
 
 void ui_flash()
 {
-    if (!get_device_state()->bleConnected)
+    if (!get_local_device_state()->bleConnected)
     {
         show_bluetooth(false);
         return;
     }
 
     show_bluetooth(true);
-    show_battery(get_device_state()->battery);
+    show_battery(get_remote_device_state()->battery);
     set_gps_all(*get_gps_data());
     _set_gyro_value(*get_imu_data());
 }

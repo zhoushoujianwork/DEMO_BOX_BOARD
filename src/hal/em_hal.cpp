@@ -35,7 +35,7 @@ void run_led(led_type_e type)
 
 void read_all_hal()
 {
-    read_battery();
+    // read_battery();
     // read_temperature();
     // read_paper_statue();
 }

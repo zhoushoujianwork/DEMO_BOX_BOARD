@@ -12,23 +12,24 @@ static BLEUUID charIMUUUID(CHARACTERISTIC_UUID_IMU);
 static boolean doConnect = false;
 static boolean connected = false;
 static boolean doScan = false;
+static BLERemoteCharacteristic *pRemoteCharacteristic;
 static BLERemoteCharacteristic *pRemoteIMUCharacteristic;
 static BLERemoteCharacteristic *pRemoteGPSCharacteristic;
 static BLEAdvertisedDevice *myDevice;
 
 static void notifyCallback(
-    BLERemoteCharacteristic *pBLERemoteCharacteristic,
+    BLERemoteCharacteristic *pRemoteCharacteristic,
     uint8_t *pData,
     size_t length,
     bool isNotify)
 {
     Serial.print("Notify callback for characteristic ");
-    Serial.print(pBLERemoteCharacteristic->getUUID().toString().c_str());
+    Serial.print(pRemoteCharacteristic->getUUID().toString().c_str());
     Serial.print(" of data length ");
     Serial.println(length);
     if (length == sizeof(device_state_t))
     {
-        memcpy(get_device_state(), pData, sizeof(device_state_t));
+        memcpy(get_remote_device_state(), pData, sizeof(device_state_t));
     }
 }
 
@@ -38,11 +39,13 @@ class MyClientCallback : public BLEClientCallbacks
     {
         Serial.println("onConnect");
         connected = true;
+        get_local_device_state()->bleConnected = true;
     }
 
     void onDisconnect(BLEClient *pclient)
     {
         connected = false;
+        get_local_device_state()->bleConnected = false;
         Serial.println("onDisconnect");
         doScan = true;
     }
@@ -73,29 +76,34 @@ bool connectToServer()
     Serial.println(" - Found our service");
 
     // Obtain a reference to the characteristic in the service of the remote BLE server.
-    pRemoteIMUCharacteristic = pRemoteService->getCharacteristic(charIMUUUID);
+    pRemoteCharacteristic = pRemoteService->getCharacteristic(CHARACTERISTIC_UUID);
+    if (pRemoteCharacteristic == nullptr)
+    {
+        Serial.print("Failed to find our CHARACTERISTIC_UUID characteristic UUID: ");
+        Serial.println(serviceUUID.toString().c_str());
+        pClient->disconnect();
+        return false;
+    }
+    Serial.println(" - Found our characteristic");
+    if (pRemoteCharacteristic->canNotify())
+        pRemoteCharacteristic->registerForNotify(notifyCallback);
+
+    pRemoteIMUCharacteristic = pRemoteService->getCharacteristic(CHARACTERISTIC_UUID_IMU);
     if (pRemoteIMUCharacteristic == nullptr)
     {
-        Serial.print("Failed to find our characteristic UUID: ");
+        Serial.print("Failed to find our CHARACTERISTIC_UUID_IMU characteristic UUID: ");
         Serial.println(serviceUUID.toString().c_str());
         pClient->disconnect();
         return false;
     }
-    Serial.println(" - Found our characteristic");
-    if (pRemoteIMUCharacteristic->canNotify())
-        pRemoteIMUCharacteristic->registerForNotify(notifyCallback);
-
-    pRemoteGPSCharacteristic = pRemoteService->getCharacteristic(charGPSUUID);
+    pRemoteGPSCharacteristic = pRemoteService->getCharacteristic(CHARACTERISTIC_UUID_GPS);
     if (pRemoteGPSCharacteristic == nullptr)
     {
-        Serial.print("Failed to find our characteristic UUID: ");
+        Serial.print("Failed to find our CHARACTERISTIC_UUID_GPS characteristic UUID: ");
         Serial.println(serviceUUID.toString().c_str());
         pClient->disconnect();
         return false;
     }
-    Serial.println(" - Found our characteristic");
-    if (pRemoteGPSCharacteristic->canNotify())
-        pRemoteGPSCharacteristic->registerForNotify(notifyCallback);
 
     return true;
 }
@@ -161,7 +169,7 @@ void ble_read_from_server()
     // with the current time since boot.
     if (connected)
     {
-        get_device_state()->bleConnected = true;
+        get_remote_device_state()->bleConnected = true;
         // read
         if (pRemoteIMUCharacteristic->canRead())
         {
@@ -181,7 +189,7 @@ void ble_read_from_server()
             }
             else
             {
-                Serial.println("Received data length mismatch");
+                Serial.println("Received imu data length mismatch");
             }
         }
 
@@ -206,13 +214,13 @@ void ble_read_from_server()
             }
             else
             {
-                Serial.println("Received data length mismatch");
+                Serial.println("Received gps data length mismatch");
             }
         }
     }
     else if (doScan)
     {
-        get_device_state()->bleConnected = false;
+        get_remote_device_state()->bleConnected = false;
         Serial.println("scanning");
         BLEDevice::getScan()->start(10, false);
         doScan = false;

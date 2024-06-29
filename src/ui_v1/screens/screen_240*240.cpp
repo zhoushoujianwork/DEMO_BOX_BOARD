@@ -8,6 +8,8 @@ static lv_obj_t *right_cont;
 
 static lv_obj_t *label_gps_time;
 static lv_obj_t *label_gps_nu;
+static lv_obj_t *label_gps_dir;
+static lv_obj_t *label_gps_alt;
 static lv_obj_t *label_gps_latlon;
 static lv_obj_t *ui_speed_arc;
 static lv_obj_t *ui_imu_arc;
@@ -17,12 +19,24 @@ static lv_obj_t *ui_speedUnit;
 
 static lv_obj_t *label_bluetooth;
 static lv_obj_t *label_battery;
-static lv_obj_t *label_gps;
+// static lv_obj_t *label_gps;
 
 void _flash_speed(int32_t v)
 {
     lv_label_set_text_fmt(ui_speedText, "%d", v);
     lv_obj_align(ui_speedText, LV_ALIGN_CENTER, 0, lv_pct(18));
+}
+
+// 0-360° gps deg 转方向 N，E，S，W，NE，NW，SE，SW
+// 地面航向角：以正北为0度，顺时针增加，
+// 0：正北 45：东北 90：东 135：东南 180：正南 225：西南 270：西 315：西北
+static const char *compass_str[] = {"N", "E", "S", "W", "NE", "NW", "SE", "SW"};
+String get_compass_str(int32_t v)
+{
+    if (v < 0)
+        v += 360;
+
+    return compass_str[v / 45 % 8];
 }
 
 void _flash_gps_data(gps_data_t data)
@@ -31,8 +45,14 @@ void _flash_gps_data(gps_data_t data)
                           data.year, data.month, data.day, data.hour, data.minute, data.second);
     lv_obj_align(label_gps_time, LV_ALIGN_CENTER, 0, 0);
 
-    lv_label_set_text_fmt(label_gps_nu, "%s", String(data.altitude, 0));
-    lv_obj_align(label_gps_nu, LV_ALIGN_CENTER, lv_pct(-9), lv_pct(-20));
+    lv_label_set_text_fmt(label_gps_nu, "%2d", data.satellites);
+    lv_obj_align(label_gps_nu, LV_ALIGN_CENTER, lv_pct(-23), lv_pct(-20));
+
+    lv_label_set_text_fmt(label_gps_alt, "%sm", String(data.altitude, 0));
+    lv_obj_align(label_gps_alt, LV_ALIGN_CENTER, lv_pct(-9), lv_pct(-20));
+
+    lv_label_set_text_fmt(label_gps_dir, "%s", get_compass_str(data.direction));
+    lv_obj_align(label_gps_dir, LV_ALIGN_CENTER, lv_pct(5), lv_pct(-20));
 
     lv_label_set_text_fmt(label_gps_latlon, "%s,%s", String(data.lng, 6), String(data.lat, 6));
     lv_obj_align(label_gps_latlon, LV_ALIGN_CENTER, 0, lv_pct(-10));
@@ -257,14 +277,27 @@ void static_screen(void)
     lv_obj_align(label_battery, LV_ALIGN_CENTER, lv_pct(14), lv_pct(-30));
 
     /* gps */
-    label_gps = lv_label_create(lv_screen_active());
-    lv_label_set_text(label_gps, LV_SYMBOL_GPS);
-    lv_obj_add_style(label_gps, &style_text, 0);
-    lv_obj_align(label_gps, LV_ALIGN_CENTER, lv_pct(-23), lv_pct(-20));
+    // label_gps = lv_label_create(lv_screen_active());
+    // lv_label_set_text(label_gps, LV_SYMBOL_GPS);
+    // lv_obj_add_style(label_gps, &style_text, 0);
+    // lv_obj_align(label_gps, LV_ALIGN_CENTER, lv_pct(-23), lv_pct(-20));
     // GPS 数量显示
     label_gps_nu = lv_label_create(lv_screen_active());
     lv_obj_add_style(label_gps_nu, &style_text, 0);
-    lv_obj_align(label_gps_nu, LV_ALIGN_CENTER, lv_pct(-9), lv_pct(-20));
+    lv_obj_align(label_gps_nu, LV_ALIGN_CENTER, lv_pct(-23), lv_pct(-20));
+
+    // autitude
+    label_gps_alt = lv_label_create(lv_screen_active());
+    lv_obj_add_style(label_gps_alt, &style_text, 0);
+    lv_label_set_text_fmt(label_gps_alt, "%sm", "99");
+    lv_obj_align(label_gps_alt, LV_ALIGN_CENTER, lv_pct(-9), lv_pct(-20));
+
+    // direction
+    label_gps_dir = lv_label_create(lv_screen_active());
+    lv_obj_add_style(label_gps_dir, &style_text, 0);
+    lv_label_set_text_fmt(label_gps_dir, "%s", "NE");
+    lv_obj_align(label_gps_dir, LV_ALIGN_CENTER, lv_pct(5), lv_pct(-20));
+
     /* gps_time */
     label_gps_time = lv_label_create(lv_screen_active());
     lv_obj_add_style(label_gps_time, &style_text, 0);

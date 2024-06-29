@@ -1,12 +1,18 @@
 #include "em_device.h"
 
-device_state_t g_device_state;
+device_state_t remote_device_state;
+device_state_t local_device_state;
 gps_data_t g_gps_data;
 imu_data_t g_imu_data;
 
-device_state_t *get_device_state()
+device_state_t *get_remote_device_state()
 {
-    return &g_device_state;
+    return &remote_device_state;
+}
+
+device_state_t *get_local_device_state()
+{
+    return &local_device_state;
 }
 
 gps_data_t *get_gps_data()
@@ -21,21 +27,21 @@ imu_data_t *get_imu_data()
 
 void set_device_gps_status(state_e status)
 {
-    g_device_state.gps_state = status;
+    remote_device_state.gps_state = status;
 }
 void set_device_imu_status(state_e status)
 {
-    g_device_state.imu_state = status;
+    remote_device_state.imu_state = status;
 }
 
 void init_device_state()
 {
-    memset(&g_device_state, 0, sizeof(device_state_t));
-    g_device_state.imu_state = STATUS_LACK;
-    g_device_state.gps_state = STATUS_LACK;
-    g_device_state.bleConnected = false;
-    g_device_state.battery = 13;
-    g_device_state.temperature = 30;
+    memset(&local_device_state, 0, sizeof(device_state_t));
+    local_device_state.imu_state = STATUS_LACK;
+    local_device_state.gps_state = STATUS_LACK;
+    local_device_state.bleConnected = false;
+    local_device_state.battery = 13;
+    local_device_state.temperature = 30;
 
     // gps
     memset(&g_gps_data, 0, sizeof(gps_data_t));

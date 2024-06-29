@@ -51,7 +51,9 @@ typedef struct
 
 void init_device_state();
 
-device_state_t *get_device_state();
+device_state_t *get_remote_device_state();
+
+device_state_t *get_local_device_state();
 
 gps_data_t *get_gps_data();
 

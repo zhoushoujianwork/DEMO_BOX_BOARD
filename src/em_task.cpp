@@ -21,6 +21,7 @@ void task_report(void *pvParameters)
     for (;;) // A Task shall never return or exit.
     {
         ble_read_from_server(); // 会阻塞
+        // read_all_hal();
         vTaskDelay(5);
     }
 }

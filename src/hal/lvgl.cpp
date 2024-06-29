@@ -36,7 +36,7 @@ void set_angle(int angle)
 {
     // 0-360
     lv_disp_t *disp = lv_disp_get_default();
-    Serial.printf("set angle = %d\n", angle);
+    // Serial.printf("set angle = %d\n", angle);
     // 添加 LV_EVENT_RESOLUTION_CHANGED 事件
     return;
     lv_display_rotation_t rota_angle;
