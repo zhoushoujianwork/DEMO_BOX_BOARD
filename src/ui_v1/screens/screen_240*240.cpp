@@ -137,7 +137,8 @@ void _init_board(void)
     {
         _set_arc_value(i);
         lv_task_handler(); // 处理LVGL任务，更新屏幕
-        lv_tick_inc(5);    // 延迟5ms，你可以根据需要调整这个值
+        delay(1);
+        lv_tick_inc(1); // 延迟5ms，你可以根据需要调整这个值
     }
 
     // 从299减少到0
@@ -145,7 +146,8 @@ void _init_board(void)
     {
         _set_arc_value(i);
         lv_task_handler(); // 处理LVGL任务，更新屏幕
-        lv_tick_inc(5);    // 延迟5ms，你可以根据需要调整这个值
+        delay(1);
+        lv_tick_inc(1); // 延迟5ms，你可以根据需要调整这个值
     }
 }
 
@@ -153,14 +155,12 @@ void _set_gyro_value(imu_data_t data)
 {
 #ifdef USE_DOT_FOR_GYRO
     // 设置文本基于当前位置开始位移,活动范围 64 像素内
-    int32_t _roll = map(data.roll, -10, 10, -32, 32);
-    int32_t _pitch = map(data.pitch, -10, 10, -32, 32);
-    lv_obj_align(label_gyro, LV_ALIGN_CENTER, _roll, _pitch);
-    lv_arc_set_value(ui_imu_arc, data.roll * 100);
+    lv_obj_align(label_gyro, LV_ALIGN_CENTER, map(data.roll, -180, 180, -64, 64), map(data.pitch, -180, 180, -64, 64));
 #else
     lv_image_set_rotation(label_gyro, map(value, -10, 10, -1800 / 2, 1800 / 2));
 #endif
-    // Serial.printf("set_gyro_value %d\n", value);
+    lv_arc_set_value(ui_imu_arc, data.roll);
+    Serial.printf("set_gyro_value pitch: %s, roll: %s yaw: %s\n", String(data.pitch, 2), String(data.roll, 2), String(data.yaw, 2));
 }
 
 void show_bluetooth(bool connected)
@@ -230,7 +230,7 @@ void static_screen(void)
 
     ui_imu_arc = lv_arc_create(lv_screen_active()); // 创建圆弧
     lv_obj_center(ui_imu_arc);
-    lv_arc_set_range(ui_imu_arc, -1000, 1000); // 设置圆弧的最大值
+    lv_arc_set_range(ui_imu_arc, -90, 90); // 设置圆弧的最大值
     lv_arc_set_value(ui_imu_arc, 0);
     lv_obj_set_size(ui_imu_arc, 220, 220);
     lv_arc_set_bg_angles(ui_imu_arc, 40, 140);
@@ -238,6 +238,12 @@ void static_screen(void)
     lv_obj_remove_style(ui_imu_arc, NULL, LV_PART_KNOB);   // 移除圆弧手柄
     lv_obj_remove_flag(ui_imu_arc, LV_OBJ_FLAG_CLICKABLE); // 移除可点击
     lv_obj_align(ui_imu_arc, LV_ALIGN_CENTER, 0, 0);
+
+    // label_imu_text = lv_label_create(ui_imu_arc); // 创建显示圆弧值的文本
+    // lv_obj_set_style_text_color(label_imu_text, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    // lv_obj_set_style_text_font(label_imu_text, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
+    // lv_obj_set_style_text_align(label_imu_text, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT); // 文本居中
+    // lv_obj_align(label_imu_text, LV_ALIGN_CENTER, 0, lv_pct(32));                                       // 居中
 
     ui_speedUnit = lv_label_create(ui_speed_arc); // // 时速单位 km/h
     lv_label_set_text(ui_speedUnit, "km/h");
@@ -316,22 +322,10 @@ void static_screen(void)
     // 用点模拟上下左右移动
     label_gyro = lv_label_create(lv_screen_active());
     lv_obj_set_size(label_gyro, 64, 64);
-    lv_obj_set_style_text_align(label_gyro, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(label_gyro, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_letter_space(label_gyro, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    // red
-    lv_obj_set_style_text_color(label_gyro, lv_color_hex(0xEF1616), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(label_gyro, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(label_gyro, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_label_set_text(label_gyro, LV_SYMBOL_PLUS);
+    lv_obj_add_style(label_gyro, &style_text, 0);
+    lv_obj_set_style_text_color(label_gyro, lv_color_hex(0xEF1616), LV_PART_MAIN | LV_STATE_DEFAULT); // 红色
     lv_obj_align(label_gyro, LV_ALIGN_CENTER, 0, 0);
-#else
-    // 用图片模拟
-    LV_IMAGE_DECLARE(LV_MOTO);
-    label_gyro = lv_image_create(screen_a);
-    lv_image_set_src(label_gyro, &LV_MOTO);
-    lv_obj_set_style_opa(label_gyro, LV_OPA_100, 0);              // 透明度设置为 100
-    lv_obj_set_style_image_recolor_opa(label_gyro, LV_OPA_30, 0); // 透明度设置为 100
 #endif
 
     Serial.println("screen_a init ok");

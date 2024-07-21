@@ -129,7 +129,7 @@ void setup_lvgl()
     lv_display_set_buffers(disp, draw_buf, NULL, sizeof(draw_buf), LV_DISPLAY_RENDER_MODE_PARTIAL);
 #endif
 
-    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_90);
 
     /*Initialize the (dummy) input device driver*/
     lv_indev_t *indev = lv_indev_create();

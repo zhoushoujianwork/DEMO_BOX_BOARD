@@ -67,12 +67,29 @@ int calculate_angle(float x, float y, float z)
     return angle;
 }
 
+// 判断 acc是否没有变化持续 10 秒，符合条件则返回 true
+bool is_acc_stable(float &x, float &y, float &z)
+{
+    if (fabs(x - acc.x) < 0.01 && fabs(y - acc.y) < 0.01 && fabs(z - acc.z) < 0.01)
+    {
+        return true;
+    }
+    return false;
+}
+
 void loop_imu()
 {
     if (qmi.getDataReady())
     {
         if (qmi.getAccelerometer(acc.x, acc.y, acc.z))
         {
+            if (is_acc_stable(acc.x, acc.y, acc.z))
+            {
+                // 陀螺仪没有变化，进入睡眠模式
+                // Serial.println("Sleeping...");
+                // delay(1000);
+                // esp_light_sleep_start();
+            }
             // 计算旋转角度，这里假设你已经有一个函数可以将IMU的姿态数据转换为角度
             int angle = calculate_angle(acc.x, acc.y, acc.z);
 
