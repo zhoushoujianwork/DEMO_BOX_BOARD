@@ -12,7 +12,6 @@ void loop_btn(void *pvParameters)
     {
         vTaskDelay(10);
         loop_btn();
-        loop_imu();
     }
 }
 
@@ -34,7 +33,9 @@ void init_task()
     setup_led();
     setup_btn();
     setup_lvgl();
+#if ENABLE_IMU
     setup_imu();
+#endif
     // return;
     xTaskCreate(
         loop_btn,   // 任务函数
@@ -67,6 +68,12 @@ void loop_task()
     {
         ui_flash();
     }
+
+#if ENABLE_IMU
+    load_imu();
+    // load_imu_kalman();
+    // read_imu();
+#endif
 
     lv_timer_handler(); // Handle LVGL tasks
     delay(5);           // Wait for 5 milliseconds before the next iteration

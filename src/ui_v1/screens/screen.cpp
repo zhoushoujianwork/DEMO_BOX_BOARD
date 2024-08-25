@@ -155,11 +155,11 @@ void _set_gyro_value(imu_data_t data)
 {
 #ifdef USE_DOT_FOR_GYRO
     // 设置文本基于当前位置开始位移,活动范围 64 像素内
-    lv_obj_align(label_gyro, LV_ALIGN_CENTER, map(data.roll, -180, 180, -64, 64), map(data.pitch, -180, 180, -64, 64));
+    lv_obj_align(label_gyro, LV_ALIGN_CENTER, map(data.pitch, -180, 180, -64, 64), map(data.roll, -180, 180, -64, 64));
 #else
     lv_image_set_rotation(label_gyro, map(value, -10, 10, -1800 / 2, 1800 / 2));
 #endif
-    lv_arc_set_value(ui_imu_arc, data.roll);
+    lv_arc_set_value(ui_imu_arc, data.pitch);
     Serial.printf("set_gyro_value pitch: %s, roll: %s yaw: %s\n", String(data.pitch, 2), String(data.roll, 2), String(data.yaw, 2));
 }
 
@@ -214,7 +214,6 @@ void static_screen(void)
     lv_obj_set_style_bg_grad_color(screen_a, lv_color_hex(0x055088), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(screen_a, LV_GRAD_DIR_VER, LV_PART_MAIN | LV_STATE_DEFAULT);
     // lv_obj_set_size(screen_a, lv_pct(100), lv_pct(100));
-    // lv_obj_set_size(screen_a, 240, 240);
     lv_disp_load_scr(screen_a);
 
     /* 速度 arc */

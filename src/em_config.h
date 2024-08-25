@@ -2,7 +2,7 @@
 #define _EM_CONFIG_H_
 
 #include <Arduino.h>
-#define LedPin 2 // LED引脚
+#define LedPin 17 // LED引脚
 
 #define BtnPin 0           // 按键引脚
 #define ShortPressTime 500 // 短按时间 单位毫秒
@@ -20,10 +20,16 @@
 
 #define USE_DOT_FOR_GYRO 1 // 是否使用点样式显示陀螺仪数据
 
+#define ENABLE_IMU 0
+
 // 设置微雪 QMI8658 六轴IMU
 #define USE_QMI8658
 #define QMI8658_SDA 6
 #define QMI8658_SCL 7
+
+// 定义IMU模块的引脚
+#define PIN_IMU_SDA 19 // IMU模块接入 I2C SDA
+#define PIN_IMU_SCL 20 // IMU模块 I2C SCL
 
 #ifndef SENSOR_IRQ
 #define QMI8658_IRQ 38
@@ -31,3 +37,6 @@
 
 #define QMI8658_IMU_CS 5
 #endif
+
+#define TFT_HOR_RES 172
+#define TFT_VER_RES 320
